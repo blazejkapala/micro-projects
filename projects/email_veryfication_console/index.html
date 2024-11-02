@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Validator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .valid {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .invalid {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .warning {
+            background-color: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ffcc80;
+        }
+
+        pre {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .tab.active {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .source-code {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-button:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Validator</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('demo')">Demo</button>
+            <button class="tab" onclick="switchTab('code')">Source Code</button>
+            <button class="tab" onclick="switchTab('docs')">Documentation</button>
+        </div>
+
+        <div id="demo" class="tab-content active">
+            <div class="input-group">
+                <h2>Check Email</h2>
+                <input type="email" id="emailInput" placeholder="Enter email address">
+                <button onclick="validateEmail()">Validate</button>
+            </div>
+            <div id="result" class="result"></div>
+        </div>
+
+        <div id="code" class="tab-content">
+            <h2>Source Code</h2>
+            <div class="source-code">
+                <button class="copy-button" onclick="copyCode()">Copy Code</button>
+                <pre><code>import re
+import dns.resolver
+from colorama import init, Fore, Style
+
+# Initialize colorama
+init()
+
+# Function to validate email addresses using a comprehensive regex
+def is_valid_email(email):
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+    return re.match(regex, email) is not None
+
+# Function to check if the email domain has MX records
+def has_mx_record(email):
+    domain = email.split('@')[-1]
+    try:
+        answers = dns.resolver.resolve(domain, 'MX')
+        return True if answers else False
+    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.exception.DNSException) as e:
+        print(f"{Fore.YELLOW}DNS lookup failed for domain {domain}: {e}{Style.RESET_ALL}")
+        return False
+
+# Common domains that should always pass the MX check
+common_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
+
+# Get the email address from the user
+email = input("Enter the email address to check: ").strip().lower()
+
+# Validate the email address
+if not is_valid_email(email):
+    print(f"{Fore.RED}Invalid email format: {email}{Style.RESET_ALL}")
+elif email.split('@')[-1] not in common_domains and not has_mx_record(email):
+    print(f"{Fore.RED}Email has no valid MX record: {email}{Style.RESET_ALL}")
+else:
+    print(f"{Fore.GREEN}Email is valid: {email}{Style.RESET_ALL}")</code></pre>
+            </div>
+
+            <h3>Requirements</h3>
+            <pre><code>pip install dnspython colorama</code></pre>
+        </div>
+
+        <div id="docs" class="tab-content">
+            <h2>Documentation</h2>
+            
+            <h3>Features</h3>
+            <ul>
+                <li>Regex pattern validation</li>
+                <li>DNS MX record verification</li>
+                <li>Common domain pre-validation</li>
+                <li>Comprehensive error checking</li>
+            </ul>
+
+            <h3>How It Works</h3>
+            <ol>
+                <li>
+                    <strong>Format Validation</strong>
+                    <ul>
+                        <li>Uses comprehensive regex pattern</li>
+                        <li>Checks for valid username and domain format</li>
+                        <li>Verifies correct use of special characters</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>DNS Verification</strong>
+                    <ul>
+                        <li>Resolves domain's MX records</li>
+                        <li>Pre-validates common email providers</li>
+                        <li>Handles DNS lookup errors gracefully</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Visual Feedback</strong>
+                    <ul>
+                        <li>🟢 Green: Valid email</li>
+                        <li>🔴 Red: Invalid format or no MX record</li>
+                        <li>🟡 Yellow: DNS lookup warnings</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function validateEmail() {
+            const email = document.getElementById('emailInput').value;
+            const result = document.getElementById('result');
+            
+            // Basic regex validation (frontend only)
+            const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+            
+            result.style.display = 'block';
+            if (!regex.test(email)) {
+                result.className = 'result invalid';
+                result.textContent = `Invalid email format: ${email}`;
+            } else {
+                result.className = 'result warning';
+                result.textContent = 'Basic format valid. For full validation including MX records, use the Python script.';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        function copyCode() {
+            const codeElement = document.querySelector('.source-code code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            const copyButton = document.querySelector('.copy-button');
+            copyButton.textContent = 'Copied!';
+            setTimeout(() => {
+                copyButton.textContent = 'Copy Code';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

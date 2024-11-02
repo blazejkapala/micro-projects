@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Playground - Project Collection</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f5;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90%, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #18181b;
+            font-weight: 600;
+        }
+
+        .project-content {
+            margin: 16px 0;
+            color: #4b5563;
+            flex-grow: 1;
+        }
+
+        .project-content h1 {
+            font-size: 1.5em;
+            margin-top: 0;
+        }
+
+        .project-content h2 {
+            font-size: 1.25em;
+        }
+
+        .project-content h3 {
+            font-size: 1.1em;
+        }
+
+        .project-content p {
+            margin: 8px 0;
+        }
+
+        .project-content ul, .project-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .project-date {
+            color: #71717a;
+            font-size: 14px;
+            font-style: italic;
+            margin: 8px 0;
+        }
+
+        .project-link {
+            display: block;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            padding: 8px 0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: auto;
+        }
+
+        .project-link:hover {
+            background-color: #2563eb;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        pre {
+            background-color: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="projects-grid">
+        
+        <article class="project-card">
+            <h3>Email_Veryfication_Console</h3>
+            <div class="project-content">
+                <h1>Email Validator</h1>
+<p>A comprehensive Python tool for validating email addresses using both regex pattern matching and DNS MX record verification.</p>
+<h2>Quick Links</h2>
+<ul>
+<li><a href="./projects/email_veryfication_console/check_email_console.py">Source Code</a></li>
+<li><a href="./projects/email_veryfication_console/index.html">View Demo</a></li>
+</ul>
+<h2>Features</h2>
+<ul>
+<li><strong>Regex Validation</strong>: Checks if email follows standard format</li>
+<li><strong>DNS Verification</strong>: Validates domain's MX records</li>
+<li><strong>Common Domain Support</strong>: Pre-validates common email providers</li>
+<li><strong>Color-coded Output</strong>: Clear visual feedback using colorama</li>
+</ul>
+<h2>Source Code</h2>
+<p>```python
+import re
+import dns.resolver
+from colorama import init, Fore, Style</p>
+<h1>Initialize colorama</h1>
+<p>init()</p>
+<h1>Function to validate email addresses using a comprehensive regex</h1>
+<p>def is_valid_email(email):
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'
+    return re.match(regex, email) is not None</p>
+<h1>Function to check if the email domain has MX records</h1>
+<p>def has_mx_record(email):
+    domain = email.split('@')[-1]
+    try:
+        answers = dns.resolver.resolve(domain, 'MX')
+        return True if answers else False
+    except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.exception.DNSException) as e:
+        print(f"{Fore.YELLOW}DNS lookup failed for domain {domain}: {e}{Style.RESET_ALL}")
+        return False</p>
+<h1>Common domains that should always pass the MX check</h1>
+<p>common_domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']</p>
+<h1>Get the email address from the user</h1>
+<p>email = input("Enter the email address to check: ").strip().lower()</p>
+<h1>Validate the email address</h1>
+<p>if not is_valid_email(email):
+    print(f"{Fore.RED}Invalid email format: {email}{Style.RESET_ALL}")
+elif email.split('@')[-1] not in common_domains and not has_mx_record(email):
+    print(f"{Fore.RED}Email has no valid MX record: {email}{Style.RESET_ALL}")
+else:
+    print(f"{Fore.GREEN}Email is valid: {email}{Style.RESET_ALL}")
+```</p>
+<h2>Requirements</h2>
+<p><code>bash
+pip install dnspython colorama</code></p>
+<h2>How It Works</h2>
+<ol>
+<li><strong>Format Validation</strong></li>
+<li>Uses comprehensive regex pattern</li>
+<li>Checks for valid username and domain format</li>
+<li>
+<p>Verifies correct use of special characters</p>
+</li>
+<li>
+<p><strong>DNS Verification</strong></p>
+</li>
+<li>Resolves domain's MX records</li>
+<li>Pre-validates common email providers</li>
+<li>
+<p>Handles DNS lookup errors gracefully</p>
+</li>
+<li>
+<p><strong>Visual Feedback</strong></p>
+</li>
+<li>🟢 Green: Valid email</li>
+<li>🔴 Red: Invalid format or no MX record</li>
+<li>🟡 Yellow: DNS lookup warnings</li>
+</ol>
+<h2>Usage</h2>
+<p><code>bash
+python check_email_console.py
+Enter the email address to check: user@example.com</code></p>
+<h2>Example Output</h2>
+<ul>
+<li>✅ <code>Email is valid: user@gmail.com</code></li>
+<li>❌ <code>Invalid email format: invalid.email@</code></li>
+<li>❌ <code>Email has no valid MX record: user@nonexistent.domain</code></li>
+</ul>
+<h2>Technical Details</h2>
+<ul>
+<li>Uses <code>dnspython</code> for MX record verification</li>
+<li>Implements RFC 5322 compliant email regex</li>
+<li>Optimized for common email providers</li>
+<li>Error handling for DNS resolution</li>
+</ul>
+            </div>
+            <div class="project-date">Last updated: 2024-11-02</div>
+            <a href="projects/email_veryfication_console/index.html" class="project-link">View Project</a>
+        </article>
+        
+        <article class="project-card">
+            <h3>Reflection</h3>
+            <div class="project-content">
+                <h1>Uniwersalny Kalkulator Załamania Światła</h1>
+<p>Interaktywna aplikacja webowa do obliczania i wizualizacji zjawiska załamania światła na granicy dwóch ośrodków.</p>
+<h2>Funkcjonalności</h2>
+<h3>1. Obliczenia kątów</h3>
+<ul>
+<li>Obliczanie kąta załamania światła na podstawie kąta padania</li>
+<li>Wykrywanie zjawiska całkowitego wewnętrznego odbicia</li>
+<li>Interaktywna wizualizacja promieni: padającego, odbitego i załamanego</li>
+<li>Możliwość wyboru predefiniowanych materiałów lub własnych współczynników załamania</li>
+</ul>
+<h3>2. Baza materiałów</h3>
+<ul>
+<li>Wbudowana baza współczynników załamania dla różnych materiałów:</li>
+<li>Próżnia (n=1.0)</li>
+<li>Powietrze (n=1.000293)</li>
+<li>Woda (n=1.333)</li>
+<li>Szkło zwykłe (n=1.52)</li>
+<li>Szkło kryształowe (n=1.66)</li>
+<li>Diament (n=2.417)</li>
+<li>Pleksiglas (n=1.49)</li>
+<li>Gliceryna (n=1.473)</li>
+</ul>
+<h3>3. Kalkulator kąta krytycznego</h3>
+<ul>
+<li>Obliczanie kąta krytycznego dla zjawiska całkowitego wewnętrznego odbicia</li>
+<li>Sprawdzanie warunków występowania zjawiska</li>
+<li>Szczegółowe wyjaśnienia i wzory</li>
+</ul>
+<h2>Interfejs</h2>
+<ul>
+<li>Intuicyjny podział na zakładki tematyczne</li>
+<li>Dynamiczna wizualizacja na canvas</li>
+<li>Interaktywny diagram pokazujący:</li>
+<li>Promień padający (czerwony)</li>
+<li>Promień odbity (zielony)</li>
+<li>Promień załamany (niebieski)</li>
+<li>Normalną (linia przerywana)</li>
+<li>Kąty padania i załamania</li>
+</ul>
+<h2>Technologie</h2>
+<ul>
+<li>HTML5</li>
+<li>CSS3 (Grid Layout, Flexbox)</li>
+<li>JavaScript (Canvas API)</li>
+<li>Responsywny design</li>
+</ul>
+<h2>Zastosowanie edukacyjne</h2>
+<p>Narzędzie jest szczególnie przydatne w:
+- Nauczaniu fizyki optycznej
+- Demonstracji zjawisk optycznych
+- Zrozumieniu zachowania światła na granicy ośrodków
+- Praktycznych obliczeniach dla systemów optycznych</p>
+<h2>Wzory i obliczenia</h2>
+<ul>
+<li>Prawo Snella: n₁sin(α) = n₂sin(β)</li>
+<li>Kąt krytyczny: α_kr = arcsin(n₂/n₁)</li>
+<li>Warunek całkowitego wewnętrznego odbicia: n₁ &gt; n₂</li>
+</ul>
+            </div>
+            <div class="project-date">Last updated: 2024-11-02</div>
+            <a href="projects/reflection/index.html" class="project-link">View Project</a>
+        </article>
+        
+    </div>
+</body>
+</html>
