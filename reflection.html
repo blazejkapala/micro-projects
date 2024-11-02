@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Uniwersalny Kalkulator Załamania Światła</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .visualization-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .material-select {
+            margin-bottom: 20px;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            background-color: #f9f9f9;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background-color: white;
+            width: 100%;
+            max-width: 600px;
+        }
+        .error {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+        .info-panel {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Uniwersalny Kalkulator Załamania Światła</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('angles')">Obliczenia kątów</div>
+            <div class="tab" onclick="switchTab('materials')">Materiały i współczynniki</div>
+            <div class="tab" onclick="switchTab('critical')">Kąt krytyczny</div>
+        </div>
+
+        <div id="angles-tab" class="tab-content">
+            <div class="input-section">
+                <div>
+                    <h3>Parametry ośrodka 1 (górny)</h3>
+                    <div class="input-group">
+                        <label>Wybierz materiał:</label>
+                        <select id="material1" onchange="updateRefractiveIndex(1)">
+                            <option value="custom">Własny współczynnik</option>
+                            <option value="air" selected>Powietrze (n=1.000293)</option>
+                            <option value="water">Woda (n=1.333)</option>
+                            <option value="glass">Szkło (n=1.52)</option>
+                            <option value="diamond">Diament (n=2.417)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Współczynnik załamania (n₁):</label>
+                        <input type="number" id="n1" value="1.000293" step="0.0001" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Kąt padania (α):</label>
+                        <input type="number" id="angle1" value="40" min="0" max="90" step="0.1">
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>Parametry ośrodka 2 (dolny)</h3>
+                    <div class="input-group">
+                        <label>Wybierz materiał:</label>
+                        <select id="material2" onchange="updateRefractiveIndex(2)">
+                            <option value="custom">Własny współczynnik</option>
+                            <option value="air">Powietrze (n=1.000293)</option>
+                            <option value="water" selected>Woda (n=1.333)</option>
+                            <option value="glass">Szkło (n=1.52)</option>
+                            <option value="diamond">Diament (n=2.417)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Współczynnik załamania (n₂):</label>
+                        <input type="number" id="n2" value="1.333" step="0.0001" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-section">
+                <div>
+                    <canvas id="waveCanvas" width="600" height="400"></canvas>
+                </div>
+                <div class="results" id="result">
+                    <h3>Wyniki:</h3>
+                    <p>Obliczenia pojawią się tu po wprowadzeniu danych.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="materials-tab" class="tab-content" style="display: none;">
+            <h3>Współczynniki załamania różnych materiałów</h3>
+            <table>
+                <tr>
+                    <th>Materiał</th>
+                    <th>Współczynnik załamania (n)</th>
+                    <th>Uwagi</th>
+                </tr>
+                <tr>
+                    <td>Próżnia</td>
+                    <td>1.0</td>
+                    <td>Wartość referencyjna</td>
+                </tr>
+                <tr>
+                    <td>Powietrze</td>
+                    <td>1.000293</td>
+                    <td>W warunkach normalnych</td>
+                </tr>
+                <tr>
+                    <td>Woda</td>
+                    <td>1.333</td>
+                    <td>W temperaturze 20°C</td>
+                </tr>
+                <tr>
+                    <td>Szkło zwykłe</td>
+                    <td>1.52</td>
+                    <td>Wartość przybliżona</td>
+                </tr>
+                <tr>
+                    <td>Szkło kryształowe</td>
+                    <td>1.66</td>
+                    <td>Wysoka zawartość ołowiu</td>
+                </tr>
+                <tr>
+                    <td>Diament</td>
+                    <td>2.417</td>
+                    <td>Najwyższy wśród naturalnych minerałów</td>
+                </tr>
+                <tr>
+                    <td>Pleksiglas</td>
+                    <td>1.49</td>
+                    <td>Materiał syntetyczny</td>
+                </tr>
+                <tr>
+                    <td>Gliceryna</td>
+                    <td>1.473</td>
+                    <td>Ciecz</td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="critical-tab" class="tab-content" style="display: none;">
+            <h3>Kalkulator kąta krytycznego</h3>
+            <p>Kąt krytyczny występuje gdy światło przechodzi z ośrodka o większym współczynniku załamania do ośrodka o mniejszym współczynniku. Przy kącie krytycznym promień załamany biegnie równolegle do powierzchni granicznej.</p>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Współczynnik załamania n₁ (ośrodek gęstszy):</label>
+                    <input type="number" id="n1Critical" value="1.333" step="0.0001" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Współczynnik załamania n₂ (ośrodek rzadszy):</label>
+                    <input type="number" id="n2Critical" value="1.000293" step="0.0001" min="1">
+                </div>
+            </div>
+            <button onclick="calculateCriticalAngle()">Oblicz kąt krytyczny</button>
+            <div class="results" id="criticalResult"></div>
+        </div>
+    </div>
+
+
+    <script>
+            // Stałe materiałowe
+            const materials = {
+                air: { n: 1.000293, name: "Powietrze" },
+                water: { n: 1.333, name: "Woda" },
+                glass: { n: 1.52, name: "Szkło" },
+                diamond: { n: 2.417, name: "Diament" }
+            };
+    
+            // Inicjalizacja przy załadowaniu strony
+            window.onload = function() {
+                // Ustawienie początkowych wartości
+                updateRefractiveIndex(1);
+                updateRefractiveIndex(2);
+                calculate();
+    
+                // Dodanie nasłuchiwania zdarzeń
+                document.getElementById('n1').addEventListener('input', calculate);
+                document.getElementById('n2').addEventListener('input', calculate);
+                document.getElementById('angle1').addEventListener('input', calculate);
+                document.getElementById('material1').addEventListener('change', () => updateRefractiveIndex(1));
+                document.getElementById('material2').addEventListener('change', () => updateRefractiveIndex(2));
+                
+                // Nasłuchiwanie dla kalkulatora kąta krytycznego
+                document.getElementById('n1Critical').addEventListener('input', calculateCriticalAngle);
+                document.getElementById('n2Critical').addEventListener('input', calculateCriticalAngle);
+            };
+    
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.style.display = 'none';
+                });
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+    
+                document.getElementById(tabName + '-tab').style.display = 'block';
+                document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            }
+    
+            function updateRefractiveIndex(medium) {
+                const materialSelect = document.getElementById(`material${medium}`);
+                const nInput = document.getElementById(`n${medium}`);
+                
+                if (materialSelect.value !== 'custom') {
+                    nInput.value = materials[materialSelect.value].n;
+                }
+                
+                calculate();
+            }
+    
+            function calculate() {
+                const n1 = parseFloat(document.getElementById('n1').value);
+                const n2 = parseFloat(document.getElementById('n2').value);
+                const angle1 = parseFloat(document.getElementById('angle1').value);
+    
+                if (isNaN(n1) || isNaN(n2) || isNaN(angle1) || 
+                    angle1 < 0 || angle1 > 90 || n1 < 1 || n2 < 1) {
+                    document.getElementById('result').innerHTML = '<p style="color: red;">Proszę wprowadzić prawidłowe wartości.</p>';
+                    return;
+                }
+    
+                const angle1Rad = angle1 * Math.PI / 180;
+                
+                // Obliczenie kąta załamania
+                const sinAngle2 = (n1 * Math.sin(angle1Rad)) / n2;
+                
+                // Sprawdzenie czy nie występuje całkowite wewnętrzne odbicie
+                if (sinAngle2 > 1) {
+                    document.getElementById('result').innerHTML = `
+                        <h3>Wyniki:</h3>
+                        <p style="color: red;">Występuje całkowite wewnętrzne odbicie!</p>
+                        <p>Dla tych ośrodków i kąta padania światło nie przechodzi do drugiego ośrodka.</p>
+                    `;
+                    drawWaves(angle1, null, null, true);
+                    return;
+                }
+    
+                const angle2Rad = Math.asin(sinAngle2);
+                const angle2Deg = angle2Rad * 180 / Math.PI;
+    
+                // Obliczenie kąta krytycznego
+                let criticalAngle = null;
+                if (n1 > n2) {
+                    criticalAngle = Math.asin(n2 / n1) * 180 / Math.PI;
+                }
+    
+                document.getElementById('result').innerHTML = `
+                    <h3>Wyniki:</h3>
+                    <p>Kąt padania (α): ${angle1.toFixed(2)}°</p>
+                    <p>Kąt załamania (β): ${angle2Deg.toFixed(2)}°</p>
+                    <p>Stosunek współczynników załamania (n₁/n₂): ${(n1/n2).toFixed(4)}</p>
+                    ${criticalAngle ? `<p>Kąt krytyczny: ${criticalAngle.toFixed(2)}°</p>` : ''}
+                    <h4>Szczegóły:</h4>
+                    <ul>
+                        <li>Ośrodek 1: n₁ = ${n1}</li>
+                        <li>Ośrodek 2: n₂ = ${n2}</li>
+                        <li>sin(α)/sin(β) = n₂/n₁</li>
+                    </ul>
+                `;
+    
+                drawWaves(angle1, angle2Deg, criticalAngle, false);
+            }
+    
+            function calculateCriticalAngle() {
+                const n1 = parseFloat(document.getElementById('n1Critical').value);
+                const n2 = parseFloat(document.getElementById('n2Critical').value);
+    
+                if (isNaN(n1) || isNaN(n2) || n1 < 1 || n2 < 1) {
+                    document.getElementById('criticalResult').innerHTML = 
+                        '<p style="color: red;">Proszę wprowadzić prawidłowe wartości współczynników załamania.</p>';
+                    return;
+                }
+    
+                if (n1 <= n2) {
+                    document.getElementById('criticalResult').innerHTML = `
+                        <p style="color: red;">Kąt krytyczny występuje tylko gdy n₁ > n₂ 
+                        (światło przechodzi z ośrodka gęstszego optycznie do rzadszego).</p>`;
+                    return;
+                }
+    
+                const criticalAngle = Math.asin(n2 / n1) * 180 / Math.PI;
+    
+                document.getElementById('criticalResult').innerHTML = `
+                    <h3>Wyniki:</h3>
+                    <p>Kąt krytyczny: ${criticalAngle.toFixed(2)}°</p>
+                    <p>Dla kątów padania większych od kąta krytycznego występuje całkowite wewnętrzne odbicie.</p>
+                    <h4>Szczegóły:</h4>
+                    <ul>
+                        <li>Ośrodek 1 (gęstszy): n₁ = ${n1}</li>
+                        <li>Ośrodek 2 (rzadszy): n₂ = ${n2}</li>
+                        <li>Wzór: α_kr = arcsin(n₂/n₁)</li>
+                    </ul>
+                `;
+            }
+    
+            function drawWaves(angle1, angle2, criticalAngle, totalInternalReflection) {
+                const canvas = document.getElementById('waveCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Czyszczenie canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = 150;
+    
+                // Rysowanie granicy ośrodków
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+    
+                // Rysowanie normalnej (linia przerywana)
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(centerX, centerY - radius);
+                ctx.lineTo(centerX, centerY + radius);
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.setLineDash([]);
+    
+                // Kąt padania
+                const angle1Rad = angle1 * Math.PI / 180;
+    
+                // Promień padający
+                ctx.beginPath();
+                ctx.moveTo(centerX - radius * Math.sin(angle1Rad), 
+                          centerY - radius * Math.cos(angle1Rad));
+                ctx.lineTo(centerX, centerY);
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+    
+                // Promień odbity
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius * Math.sin(angle1Rad), 
+                          centerY - radius * Math.cos(angle1Rad));
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+    
+                // Promień załamany (jeśli nie występuje całkowite wewnętrzne odbicie)
+                if (!totalInternalReflection && angle2 !== null) {
+                    const angle2Rad = angle2 * Math.PI / 180;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(centerX + radius * Math.sin(angle2Rad), 
+                              centerY + radius * Math.cos(angle2Rad));
+                    ctx.strokeStyle = '#0000ff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+    
+                // Rysowanie łuków kątów
+                const arcRadius = 30;
+    
+                // Łuk dla kąta padania
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arcRadius, -Math.PI/2, -Math.PI/2 - angle1Rad, true);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+    
+                // Łuk dla kąta odbicia
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, arcRadius, -Math.PI/2, -Math.PI/2 + angle1Rad);
+                ctx.stroke();
+    
+                // Łuk dla kąta załamania (jeśli występuje)
+                if (!totalInternalReflection && angle2 !== null) {
+                    const angle2Rad = angle2 * Math.PI / 180;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, arcRadius, Math.PI/2, Math.PI/2 - angle2Rad, true);
+                    ctx.stroke();
+                }
+    
+                // Dodanie opisów
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#000';
+    
+                // Opisy ośrodków
+                ctx.fillText('n₁', centerX - 20, centerY - 10);
+                ctx.fillText('n₂', centerX - 20, centerY + 25);
+    
+                // Kąty
+                ctx.fillText(`α = ${angle1}°`, centerX - 60, centerY - 40);
+                if (!totalInternalReflection && angle2 !== null) {
+                    ctx.fillText(`β = ${angle2.toFixed(1)}°`, centerX + 40, centerY + 40);
+                }
+    
+                // Legenda
+                ctx.fillStyle = '#ff0000';
+                ctx.fillText('Promień padający', 20, 30);
+                ctx.fillStyle = '#00ff00';
+                ctx.fillText('Promień odbity', 20, 50);
+                if (!totalInternalReflection) {
+                    ctx.fillStyle = '#0000ff';
+                    ctx.fillText('Promień załamany', 20, 70);
+                }
+                ctx.fillStyle = '#666';
+                ctx.fillText('Normalna', 20, 90);
+    
+                if (totalInternalReflection) {
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillText('Całkowite wewnętrzne odbicie!', centerX - 50, centerY + 60);
+                }
+            }
+        </script>
+    </body>
+    </html>
