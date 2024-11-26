@@ -210,6 +210,132 @@ Enter the email address to check: user@example.com</code></p>
         </article>
         
         <article class="project-card">
+            <h3>Metronome </h3>
+            <div class="project-content">
+                <h1>Web Metronome</h1>
+<p>A simple, responsive web-based metronome built with HTML, JavaScript, and Tone.js. This application provides musicians with a reliable tool for tempo practice and rhythm training.</p>
+<h2>Features</h2>
+<ul>
+<li><strong>Adjustable Tempo</strong>: Control speed from 40 to 208 BPM using a slider</li>
+<li><strong>Visual Metronome</strong>: Beat indicator that flashes in sync with the tempo</li>
+<li><strong>Tap Tempo</strong>: Set the tempo by tapping rhythmically</li>
+<li><strong>High-Quality Sound</strong>: Clear, pleasant click sound using Tone.js synthesis</li>
+<li><strong>Responsive Design</strong>: Works on both desktop and mobile devices</li>
+</ul>
+<h2>Installation</h2>
+<ol>
+<li>
+<p>Clone the main repository:
+<code>bash
+git clone https://github.com/blazejkapala/micro-projects.git</code></p>
+</li>
+<li>
+<p>Navigate to the metronome project directory:
+<code>bash
+cd micro-projects/projects/reflection</code></p>
+</li>
+</ol>
+<p>Alternatively, you can use SVN to checkout only this specific directory:
+<code>bash
+svn checkout https://github.com/blazejkapala/micro-projects/trunk/projects/reflection</code></p>
+<ol>
+<li>No build process is required. Simply open <code>index.html</code> in a web browser.</li>
+</ol>
+<h2>Dependencies</h2>
+<ul>
+<li><a href="https://tonejs.github.io/">Tone.js</a> (v14.8.49) - Loaded via CDN</li>
+</ul>
+<h2>Usage</h2>
+<ol>
+<li><strong>Starting/Stopping the Metronome</strong></li>
+<li>Click the "Start" button to begin</li>
+<li>Click "Stop" to pause the metronome</li>
+<li>
+<p>The button changes color to indicate the current state</p>
+</li>
+<li>
+<p><strong>Adjusting Tempo</strong></p>
+</li>
+<li>Use the slider to set tempo between 40-208 BPM</li>
+<li>Current tempo is displayed above the slider</li>
+<li>
+<p>Alternatively, use the "Tap Tempo" button by tapping your desired rhythm</p>
+</li>
+<li>
+<p><strong>Tap Tempo Feature</strong></p>
+</li>
+<li>Click the "Tap Tempo" button rhythmically</li>
+<li>The metronome will calculate the average tempo from your last 3 taps</li>
+<li>Valid tempo range: 40-208 BPM</li>
+</ol>
+<h2>Technical Details</h2>
+<h3>HTML Structure</h3>
+<ul>
+<li>Single page application</li>
+<li>Responsive layout using flexbox</li>
+<li>Clean, minimal interface</li>
+</ul>
+<h3>JavaScript Features</h3>
+<ul>
+<li>Real-time tempo adjustment</li>
+<li>Tap tempo calculation with averaging</li>
+<li>Visual beat indication</li>
+<li>Tone.js synthesis configuration</li>
+</ul>
+<h3>Audio Implementation</h3>
+<p><code>javascript
+const synth = new Tone.Synth({
+  oscillator: {
+    type: 'triangle'
+  },
+  envelope: {
+    attack: 0.001,
+    decay: 0.1,
+    sustain: 0,
+    release: 0.1
+  }
+});</code></p>
+<h2>Browser Support</h2>
+<p>Tested and working in:
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)</p>
+<h2>Known Limitations</h2>
+<ul>
+<li>Requires JavaScript to be enabled</li>
+<li>Audio playback depends on browser audio capabilities</li>
+<li>Performance may vary on older devices</li>
+</ul>
+<h2>Future Improvements</h2>
+<p>Potential features for future versions:
+- Different time signatures
+- Multiple sound options
+- Accent patterns
+- Subdivision controls
+- Save/load tempo presets
+- Keyboard shortcuts</p>
+<h2>Contributing</h2>
+<ol>
+<li>Fork the repository</li>
+<li>Create your feature branch (<code>git checkout -b feature/AmazingFeature</code>)</li>
+<li>Commit your changes (<code>git commit -m 'Add some AmazingFeature'</code>)</li>
+<li>Push to the branch (<code>git push origin feature/AmazingFeature</code>)</li>
+<li>Open a Pull Request</li>
+</ol>
+<h2>License</h2>
+<p>This project is licensed under the MIT License - see the LICENSE file for details.</p>
+<h2>Acknowledgments</h2>
+<ul>
+<li>Tone.js team for the excellent Web Audio framework</li>
+<li>Inspired by traditional mechanical metronomes</li>
+</ul>
+            </div>
+            <div class="project-date">Last updated: 2024-11-26</div>
+            <a href="projects/metronome /index.html" class="project-link">View Project</a>
+        </article>
+        
+        <article class="project-card">
             <h3>Reflection</h3>
             <div class="project-content">
                 <h1>Uniwersalny Kalkulator Załamania Światła</h1>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Metronome</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+</head>
+<body>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background-color: #f0f0f0;">
+    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h1 style="text-align: center; color: #333; margin-bottom: 2rem;">Metronome</h1>
+      
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div id="tempoDisplay" style="font-size: 3rem; font-weight: bold; color: #444;">120 BPM</div>
+        <input type="range" id="tempoSlider" min="40" max="208" value="120" 
+               style="width: 300px; margin: 1rem 0;">
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
+        <button id="startStop" style="padding: 1rem 2rem; font-size: 1.2rem; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Start
+        </button>
+        <button id="tap" style="padding: 1rem 2rem; font-size: 1.2rem; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Tap Tempo
+        </button>
+      </div>
+
+      <div id="beatIndicator" style="width: 20px; height: 20px; border-radius: 50%; background: #ddd; margin: 0 auto;"></div>
+    </div>
+  </div>
+
+  <script>
+    const startStopButton = document.getElementById('startStop');
+    const tempoSlider = document.getElementById('tempoSlider');
+    const tempoDisplay = document.getElementById('tempoDisplay');
+    const beatIndicator = document.getElementById('beatIndicator');
+    const tapButton = document.getElementById('tap');
+
+    let isPlaying = false;
+    let interval = null;
+    let lastTapTime = 0;
+    let tapTimes = [];
+
+    // Initialize Tone.js synth
+    const synth = new Tone.Synth({
+      oscillator: {
+        type: 'triangle'
+      },
+      envelope: {
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0,
+        release: 0.1
+      }
+    }).toDestination();
+
+    function updateTempo(tempo) {
+      tempoDisplay.textContent = `${tempo} BPM`;
+      tempoSlider.value = tempo;
+      if (isPlaying) {
+        clearInterval(interval);
+        startMetronome();
+      }
+    }
+
+    function playClick() {
+      synth.triggerAttackRelease('C5', '32n', undefined, 0.5);
+      beatIndicator.style.background = '#ff4444';
+      setTimeout(() => {
+        beatIndicator.style.background = '#ddd';
+      }, 100);
+    }
+
+    function startMetronome() {
+      const tempo = parseInt(tempoSlider.value);
+      const intervalTime = (60 / tempo) * 1000;
+      interval = setInterval(playClick, intervalTime);
+    }
+
+    startStopButton.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        startStopButton.textContent = 'Stop';
+        startStopButton.style.background = '#f44336';
+        startMetronome();
+      } else {
+        startStopButton.textContent = 'Start';
+        startStopButton.style.background = '#4CAF50';
+        clearInterval(interval);
+      }
+    });
+
+    tempoSlider.addEventListener('input', (e) => {
+      updateTempo(e.target.value);
+    });
+
+    tapButton.addEventListener('click', () => {
+      const currentTime = Date.now();
+      if (lastTapTime > 0) {
+        const interval = currentTime - lastTapTime;
+        const tempo = Math.round(60000 / interval);
+        if (tempo >= 40 && tempo <= 208) {
+          tapTimes.push(tempo);
+          if (tapTimes.length > 3) {
+            tapTimes.shift();
+          }
+          const averageTempo = Math.round(tapTimes.reduce((a, b) => a + b) / tapTimes.length);
+          updateTempo(averageTempo);
+        }
+      }
+      lastTapTime = currentTime;
+    });
+  </script>
+</body>
+</html>
